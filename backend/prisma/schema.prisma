@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modèle pour les artistes (rappeurs)
+model Artist {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  imageUrl    String?
+  spotifyId   String?   @unique
+  geniusId    String?   @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relations
+  collaborationsAsMain    Collaboration[] @relation("MainArtist")
+  collaborationsAsFeatured Collaboration[] @relation("FeaturedArtist")
+  games                   Game[]          @relation("GameArtists")
+  
+  // Nouvelles relations pour les soumissions
+  submissionsAsArtist1    SubmittedCollaboration[] @relation("SubmissionArtist1")
+  submissionsAsArtist2    SubmittedCollaboration[] @relation("SubmissionArtist2")
+}
+
+// Modèle pour les collaborations entre artistes
+model Collaboration {
+  id              Int       @id @default(autoincrement())
+  mainArtistId    Int
+  featuredArtistId Int
+  songTitle       String
+  releaseYear     Int?
+  spotifyTrackId  String?   @unique
+  geniusTrackId   String?   @unique
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  mainArtist      Artist    @relation("MainArtist", fields: [mainArtistId], references: [id])
+  featuredArtist  Artist    @relation("FeaturedArtist", fields: [featuredArtistId], references: [id])
+  games           Game[]    @relation("GameCollaborations")
+  
+  @@unique([mainArtistId, featuredArtistId, songTitle])
+}
+
+// Nouveau modèle pour les collaborations soumises par les utilisateurs
+model SubmittedCollaboration {
+  id              Int       @id @default(autoincrement())
+  artist1Id       Int?      // Optionnel car l'artiste peut ne pas exister dans la base
+  artist2Id       Int?      // Optionnel car l'artiste peut ne pas exister dans la base
+  artist1Name     String    // Nom brut soumis par l'utilisateur
+  artist2Name     String    // Nom brut soumis par l'utilisateur
+  title           String?
+  album           String?
+  releaseDate     DateTime?
+  producers       String[]  @default([])
+  musicLink       String
+  additionalInfo  String?
+  status          SubmissionStatus @default(PENDING)
+  submittedAt     DateTime  @default(now())
+  approvedAt      DateTime?
+  rejectedAt      DateTime?
+  
+  // Relations
+  artist1         Artist?   @relation("SubmissionArtist1", fields: [artist1Id], references: [id])
+  artist2         Artist?   @relation("SubmissionArtist2", fields: [artist2Id], references: [id])
+}
+
+// Modèle pour les utilisateurs
+model User {
+  id          Int       @id @default(autoincrement())
+  username    String    @unique
+  email       String    @unique
+  password    String
+  role        UserRole  @default(USER)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relations
+  games       Game[]
+}
+
+// Modèle pour les parties de jeu
+model Game {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  score           Int       @default(0)
+  startedAt       DateTime  @default(now())
+  endedAt         DateTime?
+  difficulty      Difficulty @default(MEDIUM)
+  
+  // Relations
+  user            User      @relation(fields: [userId], references: [id])
+  artists         Artist[]  @relation("GameArtists")
+  collaborations  Collaboration[] @relation("GameCollaborations")
+}
+
+// Énumérations
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+// Énumération pour le statut des soumissions
+enum SubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+} 

@@ -1,0 +1,68 @@
+name: Deploy Backend to Railway
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Debug directory structure
+        run: |
+          echo "Current directory structure:"
+          ls -la
+          echo "Backend directory structure:"
+          ls -la backend/
+          echo "Content of Dockerfile:"
+          cat backend/Dockerfile
+
+      - name: Create .env file
+        working-directory: ./backend
+        run: |
+          echo "PORT=5000" > .env
+          echo "NODE_ENV=production" >> .env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "SPOTIFY_CLIENT_ID=${{ secrets.SPOTIFY_CLIENT_ID }}" >> .env
+          echo "SPOTIFY_CLIENT_SECRET=${{ secrets.SPOTIFY_CLIENT_SECRET }}" >> .env
+          echo "GENIUS_ACCESS_TOKEN=${{ secrets.GENIUS_ACCESS_TOKEN }}" >> .env
+          echo "CORS_ORIGIN=${{ secrets.CORS_ORIGIN || 'https://useless289.github.io/WikiFeats' }}" >> .env
+          echo "RATE_LIMIT_WINDOW_MS=900000" >> .env
+          echo "RATE_LIMIT_MAX=100" >> .env
+
+      - name: Build and generate Prisma client
+        working-directory: ./backend
+        run: npm run build
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy to Railway
+        working-directory: ./backend
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: railway up --detach
+
+      - name: Run database migrations and seed
+        if: success()
+        working-directory: ./backend
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: railway run "npx prisma migrate deploy && npm run db:seed"

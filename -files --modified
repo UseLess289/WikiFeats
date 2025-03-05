@@ -1,0 +1,18 @@
+warning: in the working copy of 'backend/node_modules/.prisma/client/edge.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/node_modules/.prisma/client/index-browser.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/node_modules/.prisma/client/index.d.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/node_modules/.prisma/client/index.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/node_modules/.prisma/client/package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/node_modules/.prisma/client/schema.prisma', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/node_modules/.prisma/client/wasm.js', LF will be replaced by CRLF the next time Git touches it
+M	backend/.env
+M	backend/node_modules/.prisma/client/edge.js
+M	backend/node_modules/.prisma/client/index-browser.js
+M	backend/node_modules/.prisma/client/index.d.ts
+M	backend/node_modules/.prisma/client/index.js
+M	backend/node_modules/.prisma/client/package.json
+M	backend/node_modules/.prisma/client/schema.prisma
+M	backend/node_modules/.prisma/client/wasm.js
+M	backend/src/config.js
+M	frontend/index.html
+M	frontend/src/main.jsx

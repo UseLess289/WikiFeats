@@ -1,0 +1,223 @@
+.results-container {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 25px;
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  overflow: hidden;
+}
+
+.no-results {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.collaborations-list {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.collaboration-card {
+  display: flex;
+  padding: 20px;
+  background-color: rgba(30, 30, 30, 0.6);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  border-left: 4px solid var(--primary-color);
+  overflow: hidden;
+  gap: 20px;
+}
+
+.collaboration-cover {
+  flex: 0 0 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.collaboration-cover img {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+  object-fit: cover;
+}
+
+.collaboration-cover img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3), 0 0 15px rgba(142, 68, 173, 0.5);
+}
+
+.collaboration-details {
+  flex: 1;
+  text-align: center;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.collaboration-title {
+  font-size: 1.3rem;
+  color: var(--white);
+  text-shadow: 0 0 10px rgba(155, 89, 182, 0.3);
+  white-space: normal;
+  word-break: break-word;
+  margin-bottom: 5px;
+}
+
+.collaboration-album,
+.collaboration-date {
+  margin-bottom: 5px;
+  color: var(--dark-gray);
+  font-size: 0.85rem;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.collaboration-artists,
+.collaboration-producers {
+  margin-top: 10px;
+}
+
+.collaboration-artists h4,
+.collaboration-producers h4 {
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+  color: var(--white);
+}
+
+.artist-list,
+.producer-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+  justify-content: center;
+}
+
+.artist-item,
+.producer-item {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  color: var(--white);
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  display: inline-block;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.artist-item:hover,
+.producer-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 10px rgba(155, 89, 182, 0.5);
+}
+
+.collaboration-links {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.spotify-link,
+.genius-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+}
+
+.spotify-link {
+  background-color: #1DB954;
+  color: white;
+}
+
+.genius-link {
+  background-color: #FFFF64;
+  color: black;
+}
+
+.spotify-link:hover {
+  background-color: #1aa34a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  text-decoration: none;
+}
+
+.genius-link:hover {
+  background-color: #e6e65a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .collaboration-card {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .collaboration-cover {
+    margin-right: 0;
+    max-width: 150px;
+    height: 150px;
+  }
+  
+  .collaboration-links {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+  
+  .spotify-link,
+  .genius-link {
+    text-align: center;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .results-container {
+    padding: 15px;
+  }
+  
+  .collaboration-cover {
+    max-width: 120px;
+    height: 120px;
+  }
+  
+  .collaboration-title {
+    font-size: 1.1rem;
+  }
+  
+  .artist-item,
+  .producer-item {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+  }
+  
+  .collaboration-artists h4,
+  .collaboration-producers h4 {
+    font-size: 0.9rem;
+  }
+} 
