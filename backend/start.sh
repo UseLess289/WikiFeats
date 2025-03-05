@@ -13,6 +13,10 @@ if [ -z "$DATABASE_URL" ]; then
   exit 1
 fi
 
+# Générer le client Prisma
+echo "Génération du client Prisma..."
+npx prisma generate
+
 # Appliquer les migrations Prisma pour créer les tables
 echo "Application des migrations Prisma..."
 npx prisma migrate deploy
@@ -21,16 +25,22 @@ npx prisma migrate deploy
 if [ $? -eq 0 ]; then
   echo "Migrations appliquées avec succès!"
   
-  # Vérifier si la base de données est vide et la remplir si nécessaire
+  # Vérifier si la base de données est vide en utilisant le script dédié
   echo "Vérification des données existantes..."
-  ARTIST_COUNT=$(npx prisma studio --port 5555 --browser none & sleep 5 && curl -s http://localhost:5555/artist | grep -c "id")
+  node scripts/check-database.js > /tmp/db_check_output
   
-  if [ "$ARTIST_COUNT" -eq "0" ]; then
+  # Vérifier le résultat du script
+  if grep -q "DATABASE_EMPTY" /tmp/db_check_output; then
     echo "Base de données vide, exécution du script de seed..."
     npx prisma db seed
-  else
+  elif grep -q "DATABASE_NOT_EMPTY" /tmp/db_check_output; then
     echo "La base de données contient déjà des données."
+  else
+    echo "AVERTISSEMENT: Impossible de vérifier l'état de la base de données. Tentative de démarrage de l'application..."
   fi
+  
+  # Nettoyer le fichier temporaire
+  rm -f /tmp/db_check_output
   
   echo "Démarrage de l'application..."
   npm start

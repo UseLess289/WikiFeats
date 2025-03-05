@@ -1,7 +1,7 @@
 FROM node:18-alpine
 
-# Installer les dépendances nécessaires pour Prisma
-RUN apk add --no-cache openssl openssl-dev libc6-compat curl
+# Installer les dépendances nécessaires pour Prisma et les outils de débogage
+RUN apk add --no-cache openssl openssl-dev libc6-compat curl postgresql-client
 
 # Créer un utilisateur non-root pour exécuter l'application
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
@@ -16,17 +16,16 @@ WORKDIR /app
 RUN pwd
 RUN ls -la
 
-# Copier les fichiers de dependances
+# Copier les fichiers de dépendances
 COPY package*.json ./
 
-# Installer les dependances
+# Installer les dépendances
 RUN npm install
 
 # Copier le reste des fichiers
 COPY . .
 
-# Copier le script de démarrage
-COPY start.sh /app/start.sh
+# Copier le script de démarrage et le rendre exécutable
 RUN chmod +x /app/start.sh
 
 # Définir les permissions correctes
@@ -39,11 +38,11 @@ RUN ls -la
 # Passer à l'utilisateur non-root
 USER appuser
 
-# Generer le client Prisma avec les permissions correctes
+# Générer le client Prisma
 RUN npx prisma generate
 
 # Exposer le port
 EXPOSE 5000
 
-# Commande de demarrage
+# Commande de démarrage
 CMD ["/app/start.sh"] 
