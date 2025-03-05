@@ -25,12 +25,19 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
+      - name: List Railway services
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          echo "Listing Railway services..."
+          railway service list
+
       - name: Deploy to Railway
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
           echo "Deploying to Railway..."
-          railway up --service wikifeats-backend --detach
+          railway up --service "wikifeats-backend" --detach
 
       - name: Run database migrations and seed
         if: success()
@@ -41,4 +48,4 @@ jobs:
           echo "Installing dependencies..."
           npm install
           echo "Running migrations and seed..."
-          railway run --service wikifeats-backend "npx prisma migrate deploy && npm run db:seed"
+          railway run --service "wikifeats-backend" "npx prisma migrate deploy && npm run db:seed"
