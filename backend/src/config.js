@@ -15,21 +15,7 @@ const config = {
   
   // Configuration CORS
   corsOptions: {
-    origin: function(origin, callback) {
-      const allowedOrigins = process.env.CORS_ORIGIN 
-        ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
-        : [`http://localhost:${process.env.FRONTEND_PORT || 3000}`];
-      
-      // Autoriser les requêtes sans origine (comme les appels API directs)
-      if (!origin) return callback(null, true);
-      
-      if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
-        callback(null, true);
-      } else {
-        console.warn(`Origine non autorisée: ${origin}`);
-        callback(new Error('Origine non autorisée par CORS'));
-      }
-    },
+    origin: '*', // Autoriser toutes les origines temporairement pour déboguer
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
