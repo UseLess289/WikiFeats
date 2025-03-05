@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# Fonction pour afficher les messages d'erreur
+error_exit() {
+  echo "ERREUR: $1"
+  exit 1
+}
+
 # Afficher les variables d'environnement pour le débogage
 echo "Démarrage de l'application..."
 echo "Variables d'environnement :"
@@ -9,30 +15,36 @@ echo "NODE_ENV: $NODE_ENV"
 
 # Vérifier si la variable DATABASE_URL est définie
 if [ -z "$DATABASE_URL" ]; then
-  echo "ERREUR: La variable DATABASE_URL n'est pas définie!"
-  exit 1
+  error_exit "La variable DATABASE_URL n'est pas définie!"
+fi
+
+# Vérifier si le répertoire prisma existe
+if [ ! -d "./prisma" ]; then
+  echo "AVERTISSEMENT: Le répertoire prisma n'existe pas dans le répertoire courant."
+  echo "Répertoire courant: $(pwd)"
+  echo "Contenu du répertoire:"
+  ls -la
 fi
 
 # Générer le client Prisma
 echo "Génération du client Prisma..."
-npx prisma generate
+npx prisma generate || error_exit "Impossible de générer le client Prisma!"
 
 # Appliquer les migrations Prisma pour créer les tables
 echo "Application des migrations Prisma..."
-npx prisma migrate deploy
+npx prisma migrate deploy || error_exit "Impossible d'appliquer les migrations à la base de données!"
 
-# Si les migrations sont réussies, essayer de remplir la base de données
-if [ $? -eq 0 ]; then
-  echo "Migrations appliquées avec succès!"
-  
-  # Vérifier si la base de données est vide en utilisant le script dédié
-  echo "Vérification des données existantes..."
-  node scripts/check-database.js > /tmp/db_check_output
+echo "Migrations appliquées avec succès!"
+
+# Vérifier si la base de données est vide
+echo "Vérification des données existantes..."
+if [ -f "./scripts/check-database.js" ]; then
+  node ./scripts/check-database.js > /tmp/db_check_output
   
   # Vérifier le résultat du script
   if grep -q "DATABASE_EMPTY" /tmp/db_check_output; then
     echo "Base de données vide, exécution du script de seed..."
-    npx prisma db seed
+    npx prisma db seed || echo "AVERTISSEMENT: Erreur lors de l'exécution du script de seed, mais on continue..."
   elif grep -q "DATABASE_NOT_EMPTY" /tmp/db_check_output; then
     echo "La base de données contient déjà des données."
   else
@@ -41,10 +53,22 @@ if [ $? -eq 0 ]; then
   
   # Nettoyer le fichier temporaire
   rm -f /tmp/db_check_output
-  
-  echo "Démarrage de l'application..."
-  npm start
 else
-  echo "ERREUR: Impossible d'appliquer les migrations à la base de données!"
-  exit 1
-fi 
+  echo "AVERTISSEMENT: Le script check-database.js n'existe pas. Tentative de vérification directe..."
+  
+  # Tentative de vérification directe avec Prisma
+  npx prisma db pull --print > /tmp/db_schema
+  if grep -q "model" /tmp/db_schema; then
+    echo "La base de données contient déjà des tables."
+  else
+    echo "Base de données vide ou inaccessible. Tentative d'exécution du script de seed..."
+    npx prisma db seed || echo "AVERTISSEMENT: Erreur lors de l'exécution du script de seed, mais on continue..."
+  fi
+  
+  # Nettoyer le fichier temporaire
+  rm -f /tmp/db_schema
+fi
+
+# Démarrer l'application
+echo "Démarrage de l'application..."
+npm start 
