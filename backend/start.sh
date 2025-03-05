@@ -13,16 +13,28 @@ if [ -z "$DATABASE_URL" ]; then
   exit 1
 fi
 
-# Tester la connexion à la base de données avec Prisma
-echo "Test de la connexion à la base de données..."
-npx prisma db pull --force
+# Appliquer les migrations Prisma pour créer les tables
+echo "Application des migrations Prisma..."
+npx prisma migrate deploy
 
-# Si la connexion est réussie, démarrer l'application
+# Si les migrations sont réussies, essayer de remplir la base de données
 if [ $? -eq 0 ]; then
-  echo "Connexion à la base de données réussie!"
+  echo "Migrations appliquées avec succès!"
+  
+  # Vérifier si la base de données est vide et la remplir si nécessaire
+  echo "Vérification des données existantes..."
+  ARTIST_COUNT=$(npx prisma studio --port 5555 --browser none & sleep 5 && curl -s http://localhost:5555/artist | grep -c "id")
+  
+  if [ "$ARTIST_COUNT" -eq "0" ]; then
+    echo "Base de données vide, exécution du script de seed..."
+    npx prisma db seed
+  else
+    echo "La base de données contient déjà des données."
+  fi
+  
   echo "Démarrage de l'application..."
   npm start
 else
-  echo "ERREUR: Impossible de se connecter à la base de données!"
+  echo "ERREUR: Impossible d'appliquer les migrations à la base de données!"
   exit 1
 fi 
