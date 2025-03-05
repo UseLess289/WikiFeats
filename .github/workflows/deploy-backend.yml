@@ -38,6 +38,15 @@ jobs:
           args: "railway variables list"
           detach: false
 
+      - name: Configure Database Connection
+        if: success()
+        uses: bervProject/railway-deploy@main
+        with:
+          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+          service: "WikiFeats"
+          args: "railway variables set DATABASE_URL=postgresql://postgres:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}"
+          detach: false
+
       - name: Run database migrations and seed
         if: success()
         uses: bervProject/railway-deploy@main
