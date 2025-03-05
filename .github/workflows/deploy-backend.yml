@@ -15,13 +15,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Debug environment
+        run: |
+          echo "Current directory structure:"
+          ls -la
+          echo "Railway.json content:"
+          cat railway.json
+
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
       - name: Deploy to Railway
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --detach
+        run: |
+          echo "Deploying to Railway..."
+          railway up --detach
 
       - name: Run database migrations and seed
         if: success()
@@ -29,5 +38,7 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
+          echo "Installing dependencies..."
           npm install
+          echo "Running migrations and seed..."
           railway run "npx prisma migrate deploy && npm run db:seed"
