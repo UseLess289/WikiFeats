@@ -35,5 +35,5 @@ jobs:
         with:
           railway_token: ${{ secrets.RAILWAY_TOKEN }}
           service: "WikiFeats"
-          command: "cd backend && npm install && npx prisma migrate deploy && npm run db:seed"
+          args: "cd backend && npm install && npx prisma migrate deploy && npm run db:seed"
           detach: false
