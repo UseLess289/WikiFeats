@@ -41,5 +41,9 @@ RUN npx prisma generate
 # Exposer le port
 EXPOSE 5000
 
+# Script de démarrage avec débogage des variables d'environnement
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
 # Commande de demarrage
-CMD ["npm", "start"] 
+CMD ["/app/start.sh"] 
