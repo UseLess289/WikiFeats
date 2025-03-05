@@ -18,6 +18,11 @@ const RATE_LIMIT_MAX = process.env.RATE_LIMIT_MAX || 100;
 // Initialisation de l'application
 const app = express();
 
+// Debug des variables d'environnement
+console.log('Variables d\'environnement:');
+console.log(`CORS_ORIGIN: ${process.env.CORS_ORIGIN}`);
+console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+
 // Middleware
 app.use(helmet()); // Sécurité
 app.use(cors(config.corsOptions));
@@ -74,7 +79,12 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Serveur démarré sur le port ${PORT}`);
   console.log(`Environnement: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`CORS autorisé pour: ${JSON.stringify(config.corsOptions.origin)}`);
+  
+  // Afficher les origines CORS autorisées
+  const allowedOrigins = process.env.CORS_ORIGIN 
+    ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
+    : [`http://localhost:${process.env.FRONTEND_PORT || 3000}`];
+  console.log(`CORS autorisé pour: ${JSON.stringify(allowedOrigins)}`);
 });
 
 module.exports = app; // Pour les tests 
